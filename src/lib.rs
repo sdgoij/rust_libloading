@@ -36,7 +36,7 @@
 //! The compiler will ensure that the loaded function will not outlive the `Library` from which it comes,
 //! preventing the most common memory-safety issues.
 #![cfg_attr(
-    any(unix, windows),
+    any(unix, windows, target_os = "minix"),
     deny(missing_docs, clippy::all, unreachable_pub, unused)
 )]
 #![cfg_attr(libloading_docs, feature(doc_cfg))]
@@ -44,12 +44,12 @@
 pub mod changelog;
 mod error;
 pub mod os;
-#[cfg(any(unix, windows, libloading_docs))]
+#[cfg(any(unix, windows, target_os = "minix", libloading_docs))]
 mod safe;
 mod util;
 
 pub use self::error::Error;
-#[cfg(any(unix, windows, libloading_docs))]
+#[cfg(any(unix, windows, target_os = "minix", libloading_docs))]
 pub use self::safe::{Library, Symbol};
 use std::env::consts::{DLL_PREFIX, DLL_SUFFIX};
 use std::ffi::{OsStr, OsString};

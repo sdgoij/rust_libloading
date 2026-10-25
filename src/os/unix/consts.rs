@@ -58,7 +58,11 @@ mod posix {
     use self::cfg_if::cfg_if;
     use super::c_int;
     cfg_if! {
-        if #[cfg(target_os = "haiku")] {
+        if #[cfg(target_os = "minix")] {
+            // `tools/c-include/dlfcn.h`: the port's loader binds eagerly, so `RTLD_LAZY`
+            // and `RTLD_NOW` ask the same thing of it, and only the numbers differ.
+            pub(super) const RTLD_LAZY: c_int = 0x0001;
+        } else if #[cfg(target_os = "haiku")] {
             pub(super) const RTLD_LAZY: c_int = 0;
         } else if #[cfg(target_os = "aix")] {
             pub(super) const RTLD_LAZY: c_int = 4;
@@ -99,7 +103,9 @@ mod posix {
     }
 
     cfg_if! {
-        if #[cfg(target_os = "haiku")] {
+        if #[cfg(target_os = "minix")] {
+            pub(super) const RTLD_NOW: c_int = 0x0002;
+        } else if #[cfg(target_os = "haiku")] {
             pub(super) const RTLD_NOW: c_int = 1;
         } else if #[cfg(any(
             target_os = "linux",
@@ -146,6 +152,8 @@ mod posix {
             all(target_os = "android",target_pointer_width = "32"),
         ))] {
             pub(super) const RTLD_GLOBAL: c_int = 2;
+        } else if #[cfg(target_os = "minix")] {
+            pub(super) const RTLD_GLOBAL: c_int = 0x0100;
         } else if #[cfg(target_os = "aix")] {
             pub(super) const RTLD_GLOBAL: c_int = 0x10000;
         } else if #[cfg(any(
@@ -197,6 +205,8 @@ mod posix {
            target_os = "nto",
         ))] {
             pub(super) const RTLD_LOCAL: c_int = 0x200;
+        } else if #[cfg(target_os = "minix")] {
+            pub(super) const RTLD_LOCAL: c_int = 0x0000;
         } else if #[cfg(target_os = "aix")] {
             pub(super) const RTLD_LOCAL: c_int = 0x80000;
         } else if #[cfg(any(
